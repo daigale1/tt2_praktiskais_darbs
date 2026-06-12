@@ -29,4 +29,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function publishedTasksCount(): int
+    {
+        return $this->tasks()->count();
+    }
+
+    public function offersCount(): int
+    {
+        return $this->offers()->count();
+    }
+
+    public function completedTasksCount(): int
+    {
+        return $this->tasks()->where('status', 'completed')->count();
+}
 }
