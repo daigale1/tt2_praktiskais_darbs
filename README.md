@@ -93,12 +93,3 @@ public/
 └── js/app.js                # Dark mode toggle, poster popup, toast
                              #   notifications, card fade animation
 ```
-
----
-
-## Roles
-
-| Role | Access |
-|---|---|
-| `user` | Everything except the admin panel |
-| `admin` | All user access + admin panel (view/remove tasks, block/unblock users) |
