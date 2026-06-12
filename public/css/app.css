@@ -1,0 +1,523 @@
+/* ============================================================
+   app.css - Main stylesheet for Neighbors Helping Neighbors
+   Contains CSS custom properties (variables) for light/dark mode,
+   base reset, layout, components, and utility classes.
+   ============================================================ */
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@400;500&display=swap');
+
+/* ========== LIGHT MODE (default) ========== */
+:root {
+    /* Background colors */
+    --pg:           #faf9f4;   /* Page background */
+    --surf:         #f2f0e8;   /* Surface / cards / sidebar background */
+    --beige:        #e8e2cc;
+    --beige-dark:   #ddd8c0;
+
+    /* Sage – primary UI accents */
+    --sage-lightest: #e4ecda;
+    --sage-light:    #ccd8b8;
+    --sage:          #b8c8a8;
+    --sage-mid:      #a0b490;   /* Active states, borders */
+    --sage-deep:     #88a078;
+
+    /* Green – buttons, interactive elements */
+    --green-lightest: #d8e8b0;
+    --green-base:     #c8d8a0;
+    --green-hover:    #b0c484;
+    --green-pressed:  #90a860;  /* Primary button background */
+    --green-text:     #6a8040;
+
+    /* Dusty Rose – highlights, tags */
+    --rose-lightest: #f5e8e4;
+    --rose-base:     #e8c4b8;
+    --rose-mid:      #d4a898;
+    --rose-deep:     #b88070;
+    --rose-text:     #8c5848;
+
+    /* Text & borders */
+    --tx:       #2c2a20;        /* Primary text */
+    --tx2:      #5a5640;        /* Secondary text */
+    --tx3:      #8a8670;        /* Muted / placeholder text */
+    --border:   #c8c4b0;        /* Border color */
+}
+
+/* ========== DARK MODE ========== */
+[data-theme="dark"] {
+    /* Backgrounds – deeper, purplish tones */
+    --pg:           #16121f;
+    --surf:         #1e1a2c;
+    --beige:        #26203a;
+    --beige-dark:   #2e2848;
+
+    /* Purple – primary accent in dark mode (renamed from sage) */
+    --sage-lightest: #3a3060;
+    --sage-light:    #5548a0;
+    --sage:          #7060c8;
+    --sage-mid:      #9080e0;
+    --sage-deep:     #b8a8f8;
+
+    /* Sage Green – buttons in dark mode */
+    --green-lightest: #1c2e20;
+    --green-base:     #2a4430;
+    --green-hover:    #4a7850;
+    --green-pressed:  #70a878;
+    --green-text:     #a8d8a8;
+
+    /* Dusty Rose – highlights */
+    --rose-lightest: #2c1c1c;
+    --rose-base:     #4a2828;
+    --rose-mid:      #7a4840;
+    --rose-deep:     #b08070;
+    --rose-text:     #e0b8a8;
+
+    /* Text & borders */
+    --tx:       #f0ecff;
+    --tx2:      #c0b8e0;
+    --tx3:      #8880a8;
+    --border:   #3c3460;
+}
+
+/* ========== RESET & BASE ========== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--pg);
+    color: var(--tx);
+    min-height: 100vh;
+}
+
+/* ========== LAYOUT ========== */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--surf);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 100;
+}
+
+/* Top section: user avatar + theme toggle */
+.sb-top {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sb-user-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--beige);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tx);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.mode-btn {
+    margin-left: auto;
+    background: var(--beige);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 15px;
+    color: var(--tx);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+/* Navigation items */
+.sb-nav {
+    padding: 6px 0;
+    flex: 1;
+}
+
+.nav-item {
+    display: block;
+    padding: 10px 16px;
+    font-size: 14px;
+    color: var(--tx2);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.12s, color 0.12s;
+    text-decoration: none;
+}
+
+.nav-item:hover {
+    background: var(--sage-lightest);
+    color: var(--tx);
+}
+
+.nav-item.active {
+    color: var(--sage-mid);
+    border-left-color: var(--sage-mid);
+    background: var(--sage-lightest);
+    font-weight: 500;
+}
+
+/* ========== MAIN CONTENT ========== */
+.main-content {
+    margin-left: 220px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Page header (colored bar) */
+.page-header {
+    background: var(--sage-mid);
+    padding: 12px 24px;
+    text-align: center;
+}
+
+.page-header h1 {
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+}
+
+/* ========== TASK FEED (Tinder‑like card) ========== */
+.task-feed {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+}
+
+.task-card {
+    background: var(--pg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 680px;
+}
+
+.task-img-wrap {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: var(--beige);
+}
+
+.task-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.task-info {
+    padding: 18px 20px;
+    border-top: 1px solid var(--border);
+}
+
+.dist-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    background: var(--sage-lightest);
+    color: var(--green-text);
+    border-radius: 4px;
+    padding: 3px 8px;
+    margin-bottom: 12px;
+}
+
+.task-line {
+    font-size: 14px;
+    color: var(--tx);
+    line-height: 1.7;
+    margin-bottom: 6px;
+}
+
+.task-line strong {
+    font-weight: 500;
+}
+
+.poster-link {
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: var(--tx);
+}
+
+.task-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+}
+
+/* ========== BUTTONS ========== */
+.btn-offer {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 6px;
+    border: none;
+    background: var(--green-pressed);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-offer:hover {
+    background: var(--green-text);
+}
+
+.btn-skip {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 6px;
+    border: none;
+    background: var(--rose-deep);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-skip:hover {
+    background: var(--rose-text);
+}
+
+/* Generic primary button */
+.btn-primary {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    background: var(--green-pressed);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-primary:hover {
+    background: var(--green-text);
+}
+
+/* Secondary / outline button */
+.btn-secondary {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--tx2);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+    background: var(--beige);
+}
+
+/* ========== POSTER POPUP (profile preview) ========== */
+.poster-popup {
+    position: fixed;
+    left: 220px;
+    top: 80px;
+    width: 210px;
+    background: var(--pg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    z-index: 200;
+    display: none;
+}
+
+.poster-popup.open {
+    display: block;
+}
+
+.popup-tail {
+    position: absolute;
+    right: -10px;
+    top: 24px;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 10px solid var(--border);
+}
+
+/* Inner white triangle to simulate a bubble tail */
+.popup-tail::after {
+    content: '';
+    position: absolute;
+    right: 2px;
+    top: -7px;
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-left: 9px solid var(--pg);
+}
+
+.popup-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--tx3);
+    font-size: 15px;
+    padding: 0;
+}
+
+.poster-popup h4 {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--tx);
+}
+
+.poster-popup p {
+    font-size: 12px;
+    color: var(--tx2);
+    line-height: 1.8;
+    margin-bottom: 6px;
+}
+
+/* ========== EMPTY STATE (no data) ========== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--tx3);
+    gap: 10px;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 36px;
+}
+
+/* ========== FORMS ========== */
+.form-card {
+    background: var(--pg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    margin: 24px auto;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--tx2);
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surf);
+    color: var(--tx);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--sage-mid);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Character counter (optional) */
+.char-count {
+    font-size: 11px;
+    color: var(--tx3);
+    text-align: right;
+    margin-top: 4px;
+}
+
+/* ========== TOAST NOTIFICATION ========== */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green-pressed);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+}
+
+.toast.show {
+    opacity: 1;
+}
+
+/* ========== UTILITY CLASSES ========== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
