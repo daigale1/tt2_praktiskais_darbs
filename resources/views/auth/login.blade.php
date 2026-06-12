@@ -1,47 +1,68 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login — Neighbors Helping Neighbors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <style>
+        body { display:flex; align-items:center; justify-content:center; min-height:100vh; background:var(--pg); }
+        .auth-card { background:var(--surf); border:1px solid var(--border); border-radius:12px; padding:32px; width:100%; max-width:380px; }
+        .auth-logo { font-family:'Lora',serif; font-size:20px; font-weight:600; color:var(--tx); text-align:center; margin-bottom:6px; }
+        .auth-sub  { font-size:13px; color:var(--tx3); text-align:center; margin-bottom:24px; }
+    </style>
+</head>
+<body>
 
-    <form method="POST" action="{{ route('login') }}">
+<div class="auth-card">
+    <div class="auth-logo">Neighbors Helping Neighbors</div>
+    <div class="auth-sub">Sign in to your account</div>
+
+    @if($errors->any())
+        <div style="background:var(--rose-lightest); border:1px solid var(--rose-deep); border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13px; color:var(--rose-text);">
+            {{ $errors->first() }}
+        </div>
+    @endif
+
+    <form action="{{ route('login') }}" method="POST">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email"
+                   value="{{ old('email') }}"
+                   placeholder="you@example.com"
+                   required autofocus>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password"
+                   placeholder="••••••••" required>
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:18px;">
+            <input type="checkbox" id="remember" name="remember" style="width:auto;">
+            <label for="remember" style="font-size:13px; color:var(--tx2); font-weight:400; cursor:pointer; margin:0;">
+                Remember me
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+        <button type="submit" class="btn-offer" style="width:100%; padding:11px 0;">
+            Sign in
+        </button>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <p style="text-align:center; font-size:13px; color:var(--tx3); margin-top:16px;">
+            No account?
+            <a href="{{ route('register') }}" style="color:var(--sage-mid); text-decoration:none; font-weight:500;">
+                Register here
+            </a>
+        </p>
     </form>
-</x-guest-layout>
+</div>
+
+</body>
+</html>
