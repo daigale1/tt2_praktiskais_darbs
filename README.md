@@ -1,58 +1,104 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Neighbors Helping Neighbors
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A community task-sharing web app where people can post tasks they need help with and offer to help neighbors nearby.
 
-## About Laravel
+Built with Laravel (PHP) and plain HTML/CSS/JS.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## What it does
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Post tasks** — describe something you need help with, add a location, optional photo and scheduled time
+- **Browse the feed** — see open tasks posted by others in a swipe-style card UI
+- **Offer to help** — swipe right to offer; a match is created and a private chat opens automatically
+- **Chat** — each match gets its own conversation between the task poster and the helper
+- **Mark complete** — the task owner can close the task from the chat header once done
+- **Admin panel** — admins can view all tasks and users, remove tasks, and block/unblock accounts
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Used technologies
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+| Layer | Technology |
+|---|---|
+| Backend | Laravel 11, PHP |
+| Database | MySQL (via DDEV) |
+| Frontend | Blade templates, vanilla CSS, vanilla JS |
+| Icons | Tabler Icons |
+| Fonts | Lora (headings), DM Sans (body) |
+| Dev environment | DDEV |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## Database structure
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Table | Purpose |
+|---|---|
+| `users` | Auth, profile, location, role, blocked status |
+| `tasks` | Task posts with location, photo, schedule, status |
+| `offers` | A user's offer to help with a task |
+| `task_matches` | Created when an offer is accepted; owns the chat |
+| `messages` | Chat messages belonging to a task match |
 
-```bash
-composer require laravel/boost --dev
+Task status flow: `open` → `matched` → `completed` / `closed`
 
-php artisan boost:install
+---
+
+## Project structure
+
+```
+app/
+├── Http/
+│   └── Controllers/        # Route handlers (TaskController, FeedController,
+│                           #   SwipeController, ChatController, AdminController)
+└── Models/
+    ├── User.php             # Auth, profile, role, blocked status
+    ├── Task.php             # Task posts with location, photo, schedule
+    ├── Offer.php            # A user's offer to help
+    ├── TaskMatch.php        # Created on match; owns the chat thread
+    └── Message.php          # Individual chat messages
+
+database/
+└── migrations/              # Schema definitions for all five tables
+
+routes/
+└── web.php                  # All application routes (auth, tasks, feed,
+                             #   swipe, chat, admin)
+
+resources/views/
+├── layouts/
+│   └── app.blade.php        # Main shell (sidebar + <main> wrapper)
+├── partials/
+│   ├── sidebar.blade.php    # Navigation + dark mode toggle
+│   └── conversation_list.blade.php  # Chat sidebar panel
+├── auth/
+│   ├── login.blade.php
+│   └── register.blade.php
+├── tasks/
+│   ├── create.blade.php     # New task form
+│   └── edit.blade.php       # Edit task form
+├── feed/
+│   └── index.blade.php      # Swipe-style task card feed
+├── chat/
+│   ├── index.blade.php      # Empty state (no conversation selected)
+│   └── show.blade.php       # Active conversation view
+├── profile/
+│   └── show.blade.php       # Profile info + My tasks + Completed tabs
+└── admin/
+    └── index.blade.php      # All tasks + Users tabs with block/remove actions
+
+public/
+├── css/app.css              # All styles — CSS variables for light/dark mode,
+│                            #   layout, sidebar, cards, buttons, forms
+└── js/app.js                # Dark mode toggle, poster popup, toast
+                             #   notifications, card fade animation
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Roles
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Role | Access |
+|---|---|
+| `user` | Everything except the admin panel |
+| `admin` | All user access + admin panel (view/remove tasks, block/unblock users) |
