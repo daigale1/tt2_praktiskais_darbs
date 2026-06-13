@@ -1,3 +1,10 @@
+{{--
+    feed/index.blade.php
+    ─────────────────────
+    The task discovery feed — shows one task at a time as a card that the
+    user can act on. Passed from FeedController@index.
+--}}
+
 @extends('layouts.app')
 
 @section('content')
@@ -9,6 +16,7 @@
 <div class="task-feed">
 
     @if($tasks->isEmpty())
+        {{-- No tasks left to show --}}
         <div class="empty-state">
             <i class="ti ti-map-search" aria-hidden="true"></i>
             <span>No more tasks nearby.</span>
@@ -16,11 +24,12 @@
         </div>
     @else
 
+        {{-- Always show only the first task — the feed is one card at a time --}}
         @php $task = $tasks->first() @endphp
 
         <div class="task-card" id="taskCard">
 
-            {{-- photo_path is the correct column name in Deniss's migration --}}
+            {{-- Optional task photo, stored via Laravel's public disk --}}
             @if($task->photo_path)
                 <div class="task-img-wrap">
                     <img src="{{ asset('storage/' . $task->photo_path) }}" alt="Task photo">
@@ -29,11 +38,17 @@
 
             <div class="task-info">
 
+                {{-- Distance badge — value comes from the distance_label accessor on Task --}}
                 <div class="dist-badge">
                     <i class="ti ti-map-pin" aria-hidden="true"></i>
                     {{ $task->distance_label }}
                 </div>
 
+                {{--
+                    Poster name — clicking opens the global popup overlay.
+                    All data is passed inline as JS arguments so no extra
+                    AJAX request is needed.
+                --}}
                 <p class="task-line">
                     <strong>
                         <span class="poster-link"
@@ -56,6 +71,7 @@
                     <strong>Location:</strong> {{ $task->location }}
                 </p>
 
+                {{-- scheduled_at is cast to Carbon on the Task model --}}
                 <p class="task-line">
                     <strong>Time:</strong>
                     {{ $task->scheduled_at ? $task->scheduled_at->format('D, M j · H:i') : 'Whenever you can' }}
@@ -63,6 +79,11 @@
 
                 <div class="task-actions">
 
+                    {{--
+                        Offer to help (swipe right):
+                        SwipeController creates an Offer + TaskMatch record,
+                        then redirects to the new chat conversation.
+                    --}}
                     <form action="{{ route('swipe.store') }}" method="POST" style="flex:1;"
                           onsubmit="return animateCardOut(this);">
                         @csrf
@@ -71,6 +92,11 @@
                         <button type="submit" class="btn-offer" style="width:100%;">Offer to help</button>
                     </form>
 
+                    {{--
+                        Skip (swipe left):
+                        SwipeController records the skip so this task won't
+                        appear again, then reloads the feed with the next task.
+                    --}}
                     <form action="{{ route('swipe.store') }}" method="POST" style="flex:1;"
                           onsubmit="return animateCardOut(this);">
                         @csrf
@@ -90,6 +116,19 @@
 
 @push('scripts')
 <script>
+/**
+ * showPosterPopup(name, age, location, published, offers, completed, since)
+ * Populates and opens the global poster popup overlay defined in app.blade.php.
+ * Called when a user clicks a poster's name on the task card.
+ *
+ * @param {string}      name       Poster's full name
+ * @param {number|null} age        Poster's age (null if not set)
+ * @param {string}      location   Poster's location string (empty if not set)
+ * @param {number}      published  Count of tasks the poster has published
+ * @param {number}      offers     Count of offers the poster has made
+ * @param {number}      completed  Count of tasks the poster has completed
+ * @param {string}      since      Formatted join date string (e.g. "Jan 1st 2024")
+ */
 function showPosterPopup(name, age, location, published, offers, completed, since) {
     document.getElementById('popupName').textContent = 'About ' + name;
     document.getElementById('popupDetails').innerHTML =
