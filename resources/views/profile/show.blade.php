@@ -1,3 +1,4 @@
+
 @extends('layouts.app')
 
 @section('content')
@@ -8,6 +9,7 @@
 
 <div style="padding:20px 24px; max-width:640px; margin:0 auto;">
 
+    {{-- Tab switcher --}}
     <div style="display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:20px;">
         <button onclick="switchTab('profile',this)" class="dash-tab"
                 style="flex:1; padding:9px 0; text-align:center; font-size:13px; font-weight:500; cursor:pointer; border:none; border-right:1px solid var(--border); background:var(--green-pressed); color:#fff; font-family:'DM Sans',sans-serif;">
@@ -26,7 +28,9 @@
     {{-- ── PROFILE TAB ── --}}
     <div id="tab-profile">
 
+        {{-- Avatar + name + location card --}}
         <div style="background:var(--surf); border:1px solid var(--border); border-radius:10px; padding:20px; display:flex; gap:16px; align-items:flex-start; margin-bottom:16px;">
+            {{-- Initials avatar: first letters of first and last name --}}
             <div style="width:56px; height:56px; border-radius:50%; background:var(--sage-lightest); color:var(--green-pressed); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:500; flex-shrink:0;">
                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', Auth::user()->name)[1] ?? '', 0, 1)) }}
             </div>
@@ -41,7 +45,7 @@
             </div>
         </div>
 
-        {{-- Stats --}}
+        {{-- Stat counters --}}
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
             <div style="background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:12px; text-align:center;">
                 <div style="font-size:22px; font-weight:500; color:var(--tx);">{{ $publishedCount }}</div>
@@ -57,12 +61,14 @@
             </div>
         </div>
 
+        {{-- Success flash after saving profile --}}
         @if(session('status') === 'profile-updated')
             <div style="background:var(--sage-lightest); border:1px solid var(--sage-mid); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:13px; color:var(--green-pressed);">
                 Changes saved successfully!
             </div>
         @endif
 
+        {{-- Profile edit form --}}
         <form action="{{ route('profile.update') }}" method="POST">
             @csrf
             @method('PATCH')
@@ -92,7 +98,8 @@
     </div>
 
     {{-- ── MY TASKS TAB ── --}}
-    <div id="tab-mytasks" style="display:none;">
+    {{-- min-height prevents the empty state from squishing when there are no tasks --}}
+    <div id="tab-mytasks" style="display:none; min-height:260px;">
 
         <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
             <a href="{{ route('tasks.create') }}"
@@ -137,7 +144,7 @@
     </div>
 
     {{-- ── COMPLETED TAB ── --}}
-    <div id="tab-completed" style="display:none;">
+    <div id="tab-completed" style="display:none; min-height:260px;">
 
         @forelse($completedTasks as $task)
             <div style="background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; gap:12px;">
@@ -162,6 +169,13 @@
 
 @push('scripts')
 <script>
+/**
+ * switchTab(name, el)
+ * Switches the visible profile tab.
+ * - Resets all .dash-tab buttons to inactive style.
+ * - Highlights the clicked button (el) in green.
+ * - Hides all three tab panels, then shows the one matching `name`.
+ */
 function switchTab(name, el) {
     document.querySelectorAll('.dash-tab').forEach(t => {
         t.style.background = 'var(--surf)';
@@ -174,5 +188,20 @@ function switchTab(name, el) {
     });
     document.getElementById('tab-' + name).style.display = 'block';
 }
+
+/**
+ * On page load, read the ?tab= query parameter and activate the matching tab.
+ * This allows sidebar links (e.g. ?tab=mytasks) to open directly to the right tab.
+ * Falls back to the Profile tab if no param is present or the value is unrecognised.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const validTabs = ['profile', 'mytasks', 'completed'];
+    const param = new URLSearchParams(window.location.search).get('tab');
+    if (param && validTabs.includes(param)) {
+        const buttons = document.querySelectorAll('.dash-tab');
+        const idx = validTabs.indexOf(param);
+        switchTab(param, buttons[idx]);
+    }
+});
 </script>
 @endpush
