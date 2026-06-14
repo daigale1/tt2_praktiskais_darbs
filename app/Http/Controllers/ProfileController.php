@@ -16,8 +16,15 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        $user = $request->user();
+
+        return view('profile.show', [
+            'user' => $user,
+            'publishedCount' => $user->tasks()->count(),
+            'offersCount' => $user->offers()->count(),
+            'completedCount' => $user->tasks()->where('status', 'completed')->count(),
+            'myTasks' => $user->tasks()->where('status', 'open')->latest()->get(),
+            'completedTasks' => $user->tasks()->where('status', 'completed')->latest()->get(),
         ]);
     }
 
