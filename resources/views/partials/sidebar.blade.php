@@ -52,4 +52,12 @@
 
     </nav>
 
+    <form method="POST" action="{{ route('logout') }}" style="padding: 12px 16px; border-top: 1px solid var(--border); margin-top: auto;">
+        @csrf
+        <button type="submit" class="nav-item" style="width:100%; text-align:left; background:none; border:none; cursor:pointer; color:var(--rose-deep); font-family:'DM Sans',sans-serif;">
+            <i class="ti ti-logout" aria-hidden="true" style="margin-right:6px;"></i>
+            Log out
+        </button>
+    </form>
+
 </aside>
