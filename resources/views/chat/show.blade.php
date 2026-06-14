@@ -11,11 +11,6 @@
     <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--pg);">
 
         @php
-            {{--
-                Determine who the "other" person is:
-                - Task owner  → talking to the helper (offer->user)
-                - Helper      → talking to the task owner (task->user)
-            --}}
             $other = $match->task->user_id === Auth::id()
                 ? $match->offer->user
                 : $match->task->user;
