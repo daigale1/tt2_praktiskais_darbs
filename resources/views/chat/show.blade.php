@@ -1,4 +1,3 @@
-
 @extends('layouts.app')
 
 @section('content')
@@ -11,9 +10,8 @@
     <div style="flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--pg);">
 
         @php
-            $other = $match->task->user_id === Auth::id()
-                ? $match->offer->user
-                : $match->task->user;
+            $isOwner = $match->task->user_id === Auth::id();
+            $other = $isOwner ? $match->offer->user : $match->task->user;
         @endphp
 
         {{-- Chat header: avatar, other user's name, task title, Mark complete button --}}
@@ -26,13 +24,30 @@
                 <div style="font-size:14px; font-weight:500; color:var(--tx);">{{ $other->name }}</div>
                 <div style="font-size:12px; color:var(--tx3);">{{ $match->task->title }}</div>
             </div>
-            {{--
-                Mark complete button — only the task owner sees this,
-                and only while the task is still open.
-                Submits PATCH to tasks.close which sets status = 'completed'.
-            --}}
-            @if($match->task->user_id === Auth::id() && $match->task->status === 'open')
-                <form action="{{ route('tasks.close', $match->task) }}" method="POST">
+
+            @if($match->status === 'completed')
+                {{-- This is the helper the poster picked for this task --}}
+                <span style="padding:6px 12px; border-radius:6px; background:var(--sage-lightest); color:var(--green-pressed); font-size:12px; font-weight:500;">
+                    <i class="ti ti-circle-check" style="vertical-align:-2px; margin-right:4px;"></i>
+                    Completed
+                </span>
+            @elseif($match->status === 'cancelled')
+                {{-- The task was completed via a different helper's chat --}}
+                <span style="padding:6px 12px; border-radius:6px; background:var(--beige); color:var(--tx2); font-size:12px; font-weight:500;">
+                    {{ $isOwner ? 'Completed with someone else' : 'Task completed by someone else' }}
+                </span>
+            @elseif($isOwner && $match->task->isOpenForOffers())
+                {{--
+                    Mark complete button — only the task owner sees this,
+                    and only while the task is still open/in-progress and
+                    this specific match is still active.
+                    Submits PATCH to matches.complete, which picks THIS
+                    helper as the one who completed the task, sets the
+                    task to 'completed', and declines/cancels every other
+                    active offer on it.
+                --}}
+                <form action="{{ route('matches.complete', $match) }}" method="POST"
+                      onsubmit="return confirm('Mark this task as completed by {{ addslashes($other->name) }}? This will close the task and decline any other offers.')">
                     @csrf
                     @method('PATCH')
                     <button type="submit"

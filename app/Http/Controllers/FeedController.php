@@ -15,7 +15,7 @@ class FeedController extends Controller
         $skippedIds = collect(session('skipped_task_ids', []));
         $excludedIds = $offeredTaskIds->merge($skippedIds)->unique();
 
-        $tasks = Task::where('status', 'open')
+        $tasks = Task::whereIn('status', ['open', 'matched'])
             ->where('user_id', '!=', $user->id)
             ->whereNotIn('id', $excludedIds)
             ->with('user')

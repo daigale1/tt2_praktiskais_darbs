@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskMatchController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\SwipeController;
 use App\Http\Controllers\ChatController;
@@ -31,7 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
     Route::match(['put', 'patch'], '/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    Route::patch('/tasks/{task}/close', [TaskController::class, 'close'])->name('tasks.close');
+
+    // Poster picks the helper who completed the task from that helper's
+    // chat — closes the task and declines every other offer on it.
+    Route::patch('/matches/{taskMatch}/complete', [TaskMatchController::class, 'complete'])->name('matches.complete');
 
     // "My tasks" / "Completed" sidebar links — both land on the profile page
     Route::get('/tasks/mine', [ProfileController::class, 'edit'])->name('tasks.mine');

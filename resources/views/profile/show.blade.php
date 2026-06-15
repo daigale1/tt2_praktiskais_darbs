@@ -112,11 +112,24 @@
             <div style="background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; gap:12px;">
                 <div style="flex:1;">
                     <div style="font-size:14px; font-weight:500; color:var(--tx); margin-bottom:3px;">{{ $task->title }}</div>
-                    <div style="font-size:12px; color:var(--tx3);">📍 {{ $task->location }} · {{ $task->created_at->diffForHumans() }}</div>
+                    <div style="font-size:12px; color:var(--tx3);">
+                        📍 {{ $task->location }} · {{ $task->created_at->diffForHumans() }}
+                        @if($task->status === 'matched')
+                            · <a href="{{ route('chat.index') }}" style="color:var(--green-pressed); font-weight:500;">
+                                {{ $task->offers_count }} {{ $task->offers_count === 1 ? 'offer' : 'offers' }} to help
+                            </a>
+                        @endif
+                    </div>
                 </div>
-                <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500; background:var(--sage-lightest); color:var(--green-pressed);">
-                    Open
-                </span>
+                @if($task->status === 'matched')
+                    <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500; background:var(--beige); color:var(--tx2); white-space:nowrap;">
+                        In progress
+                    </span>
+                @else
+                    <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500; background:var(--sage-lightest); color:var(--green-pressed); white-space:nowrap;">
+                        Open
+                    </span>
+                @endif
                 <div style="display:flex; gap:4px;">
                     <a href="{{ route('tasks.edit', $task) }}"
                        style="padding:5px 10px; border-radius:5px; background:var(--green-pressed); color:#fff; font-size:12px; font-weight:500; text-decoration:none;">
@@ -150,9 +163,18 @@
             <div style="background:var(--surf); border:1px solid var(--border); border-radius:8px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; gap:12px;">
                 <div style="flex:1;">
                     <div style="font-size:14px; font-weight:500; color:var(--tx); margin-bottom:3px;">{{ $task->title }}</div>
-                    <div style="font-size:12px; color:var(--tx3);">📍 {{ $task->location }} · Completed {{ $task->updated_at->format('M Y') }}</div>
+                    <div style="font-size:12px; color:var(--tx3);">
+                        📍 {{ $task->location }} · Completed {{ $task->updated_at->format('M Y') }}
+                        @if($task->completed_role === 'helper')
+                            · Posted by {{ $task->user->name }}
+                        @elseif($task->helper)
+                            · Helped by {{ $task->helper->name }}
+                        @endif
+                    </div>
                 </div>
-                <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500; background:var(--beige); color:var(--tx2);">Done</span>
+                <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500; background:var(--beige); color:var(--tx2); white-space:nowrap;">
+                    {{ $task->completed_role === 'helper' ? 'You helped' : 'You posted' }}
+                </span>
             </div>
         @empty
             <div class="empty-state">
@@ -162,6 +184,7 @@
         @endforelse
 
     </div>
+
 
 </div>
 

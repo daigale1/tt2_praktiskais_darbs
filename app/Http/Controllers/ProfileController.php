@@ -18,13 +18,46 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        // Tasks completed because the poster picked *this* user as the helper.
+        $helpedTasks = $user->helpedTasks()
+            ->where('status', 'completed')
+            ->with('user')
+            ->latest('updated_at')
+            ->get()
+            ->map(function ($task) {
+                $task->completed_role = 'helper';
+
+                return $task;
+            });
+
+        // Tasks this user posted and have since been closed out.
+        $postedCompleted = $user->tasks()
+            ->where('status', 'completed')
+            ->with('helper')
+            ->latest('updated_at')
+            ->get()
+            ->map(function ($task) {
+                $task->completed_role = 'poster';
+
+                return $task;
+            });
+
+        $completedTasks = $postedCompleted->concat($helpedTasks)
+            ->sortByDesc('updated_at')
+            ->values();
+
         return view('profile.show', [
             'user' => $user,
             'publishedCount' => $user->tasks()->count(),
             'offersCount' => $user->offers()->count(),
-            'completedCount' => $user->tasks()->where('status', 'completed')->count(),
-            'myTasks' => $user->tasks()->where('status', 'open')->latest()->get(),
-            'completedTasks' => $user->tasks()->where('status', 'completed')->latest()->get(),
+            'completedCount' => $completedTasks->count(),
+            // "My tasks" = anything still open or in-progress (not yet completed/closed).
+            'myTasks' => $user->tasks()
+                ->whereIn('status', ['open', 'matched'])
+                ->withCount(['activeMatches as offers_count'])
+                ->latest()
+                ->get(),
+            'completedTasks' => $completedTasks,
         ]);
     }
 

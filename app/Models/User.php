@@ -71,6 +71,15 @@ class User extends Authenticatable
         return $this->hasMany(Offer::class);
     }
 
+    /**
+     * Tasks (posted by other people) that this user was picked to have
+     * completed as the helper.
+     */
+    public function helpedTasks()
+    {
+        return $this->hasMany(Task::class, 'helper_id');
+    }
+
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender_id');
@@ -86,8 +95,13 @@ class User extends Authenticatable
         return $this->offers()->count();
     }
 
+    /**
+     * Total tasks this user has completed — either as the poster whose
+     * task got finished, or as the helper who was picked to do it.
+     */
     public function getCompletedTasksCountAttribute(): int
     {
-        return $this->tasks()->where('status', 'completed')->count();
+        return $this->tasks()->where('status', 'completed')->count()
+            + $this->helpedTasks()->where('status', 'completed')->count();
     }
 }

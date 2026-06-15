@@ -8,6 +8,7 @@ class Task extends Model
 {
     protected $fillable = [
         'user_id',
+        'helper_id',
         'title',
         'description',
         'location',
@@ -32,14 +33,37 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * The neighbour who was picked as having completed this task.
+     * Only set once the poster closes the task.
+     */
+    public function helper()
+    {
+        return $this->belongsTo(User::class, 'helper_id');
+    }
+
     public function offers()
     {
         return $this->hasMany(Offer::class);
     }
 
-    public function match()
+    /**
+     * Every match this task has ever had. While a task is open/in-progress
+     * it can have several active matches at once — one per neighbour who
+     * offered to help — each with its own chat.
+     */
+    public function matches()
     {
-        return $this->hasOne(TaskMatch::class);
+        return $this->hasMany(TaskMatch::class);
+    }
+
+    /**
+     * Matches that are still "live" — i.e. helpers who offered and are
+     * still in the running to be picked for this task.
+     */
+    public function activeMatches()
+    {
+        return $this->matches()->where('status', 'active');
     }
 
     /**
@@ -50,5 +74,14 @@ class Task extends Model
     public function getDistanceLabelAttribute(): string
     {
         return $this->location ?? 'Unknown location';
+    }
+
+    /**
+     * Whether the task is still visible/available in the swipe feed
+     * (i.e. neighbours can still offer to help with it).
+     */
+    public function isOpenForOffers(): bool
+    {
+        return in_array($this->status, ['open', 'matched'], true);
     }
 }

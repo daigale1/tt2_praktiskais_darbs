@@ -41,10 +41,18 @@
                     <div style="font-size:12px; color:var(--tx2);">{{ Str::limit($task->description, 100) }}</div>
                 </div>
                 <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; flex-shrink:0;">
+                    @php
+                        $statusLabels = [
+                            'open' => 'Open',
+                            'matched' => 'In progress',
+                            'completed' => 'Completed',
+                            'closed' => 'Closed',
+                        ];
+                    @endphp
                     <span style="font-size:11px; padding:3px 8px; border-radius:4px; font-weight:500;
                         background:{{ $task->status === 'open' ? 'var(--sage-lightest)' : 'var(--beige)' }};
                         color:{{ $task->status === 'open' ? 'var(--green-pressed)' : 'var(--tx2)' }};">
-                        {{ ucfirst($task->status) }}
+                        {{ $statusLabels[$task->status] ?? ucfirst($task->status) }}
                     </span>
                     <form action="{{ route('admin.tasks.destroy', $task) }}" method="POST"
                           onsubmit="return confirm('Remove this task?')">

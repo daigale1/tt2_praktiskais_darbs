@@ -30,8 +30,16 @@ class SwipeController extends Controller
             return redirect()->route('feed.index');
         }
 
-        // Right swipe: auto-create an accepted offer + an active match,
-        // mark the task as matched, and jump straight into the chat.
+        // Right swipe: only allowed while the task is still accepting helpers.
+        // (The feed already filters these out, but guard against stale pages
+        // or resubmits hitting a task that was just completed/closed.)
+        abort_unless($task->isOpenForOffers(), 403);
+
+        // Auto-create an accepted offer + an active match, and jump straight
+        // into the chat. The task itself stays in the pool (status becomes
+        // "matched" / in-progress rather than disappearing) so other
+        // neighbours can keep offering to help — the poster picks who
+        // actually did the job later on.
         $offer = Offer::create([
             'task_id' => $task->id,
             'user_id' => Auth::id(),
@@ -45,7 +53,9 @@ class SwipeController extends Controller
             'matched_at' => now(),
         ]);
 
-        $task->update(['status' => 'matched']);
+        if ($task->status === 'open') {
+            $task->update(['status' => 'matched']);
+        }
 
         return redirect()->route('chat.show', $match);
     }

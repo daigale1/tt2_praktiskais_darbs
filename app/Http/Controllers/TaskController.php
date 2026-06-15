@@ -95,20 +95,4 @@ class TaskController extends Controller
 
         return redirect()->route('profile.edit')->with('success', 'Task deleted.');
     }
-
-    /**
-     * Mark a task as completed (called from the chat header by the task owner).
-     */
-    public function close(Task $task)
-    {
-        abort_unless($task->user_id === Auth::id(), 403);
-
-        $task->update(['status' => 'completed']);
-
-        if ($task->match) {
-            $task->match->update(['status' => 'completed']);
-        }
-
-        return redirect()->route('chat.index')->with('success', 'Task marked as completed!');
-    }
 }

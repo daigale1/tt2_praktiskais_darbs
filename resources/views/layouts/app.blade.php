@@ -51,6 +51,14 @@
 {{-- Toast notification bar — shown briefly via showToast() in app.js --}}
 <div class="toast" id="toast"></div>
 
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            showToast(@json(session('success')));
+        });
+    </script>
+@endif
+
 <script src="{{ asset('js/app.js') }}"></script>
 {{-- Per-page scripts pushed here with @push('scripts') --}}
 @stack('scripts')
